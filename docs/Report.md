@@ -11,12 +11,13 @@ course:             Computer Science and Software Engineering
 degree:             B.Sc. Single Honours
 department:         Department of Computer Science
 
-toc:                yes
+colorlinks:         yes
 font:               arial
 fontsize:           11pt
 geometry:           margin=25mm
 linespacing:        1.15
 papersize:          A4 
+toc:                yes
 
 abstract: |
     - The abstract must be an accurate reflection of what is in your report.
@@ -82,16 +83,66 @@ abstract: |
 - There should be no decisions made in this chapter
 
 # The Solution
-- The purpose of this chapter is to clearly identify, discuss, and justify
-the decisions you make
-- Depending on your type of project, you may not need to include all
-of these
-- Anaytical Work: E.g. Equations, etc. that describe your solution
-- Architectural Level: E.g. Implementation Diagrams
-- High-Level Design: E.g. Packages, Class Diagrams, etc.
-- Low-Level Design: E.g. Method speci cations, Algorithms, etc.
-- Implementation: discuss anything interesting here, put full source
-code in an appendix or attachment
+-   The purpose of this chapter is to clearly identify, discuss, and justify the
+    decisions you make
+-   Depending on your type of project, you may not need to include all of these
+-   Anaytical Work: E.g. Equations, etc. that describe your solution
+-   Architectural Level: E.g. Implementation Diagrams
+-   High-Level Design: E.g. Packages, Class Diagrams, etc.
+-   Low-Level Design: E.g. Method speci cations, Algorithms, etc.
+-   Implementation: discuss anything interesting here, put full source code in
+    an appendix or attachment
+
+\pagebreak
+
+## Choosing a Parser Library
+Haskell provides to prominent parser Libraries [attoparsec][attoparsec] and
+[parsec][parsec]. Both libraries implement _parser combinators_ but are
+different in their design principles.
+
+### Attoparsec
+attoparsec is a fast Haskell parser combinator library, aimed particularly at
+dealing efficiently with network protocols and complicated text/binary file
+formats.[^attoparsec-github]
+
+Attoparsec focuses on high performance parsing of large amounts of raw data or
+working with binary file formats. Attoparsec can work with `ByteString`s,
+a more efficient way of representing Strings as Byte Strings rather than Lists
+of Characters.[^string]
+
+Attoparsec forgoes some high-level features and readability of error messages
+for performance.
+
+### Parsec
+Parsec is designed from scratch as an industrial-strength parser library. It is
+simple, safe, well documented (on the package homepage), has extensive
+libraries, good error messages, and is fast. It is defined as a monad
+transformer that can be stacked on arbitrary monads, and it is also parametric
+in the input stream type.[^parsec-package]
+
+Parsec seems to be more suited to user facing applications, providing a rich
+error reporting module [Text.Parsec.Error][error].
+
+Parsec also implements a **monad Transformer** which allows parsec to be
+layered in a monad stack.
+
+Parsec seems to be the best choice to write a language parser as Attoparsec
+seems to be more suited to applications dealing with binary data or network
+protocols. Parsec may not be as performant as Attoparsec, but that should never
+be an issue as a programming language should never surpass gigabytes in size.
+Additionally Parsec provides a more user friendly experience with well written
+documentation.
+
+[attoparsec]: http://hackage.haskell.org/package/attoparsec
+[error]:      https://hackage.haskell.org/package/parsec-3.1.9/docs/Text-Parsec-Error.html
+[parsec]:     http://hackage.haskell.org/package/parsec
+
+[^attoparsec-github]: attoparsec readme file.
+    <https://github.com/bos/attoparsec/blob/master/README.markdown>
+[^parsec-package]: Parsec Hackage page
+    <https://hackage.haskell.org/package/parsec-3.1.9>
+[^string]: `type String = [Char]`
+    <https://hackage.haskell.org/package/base-4.8.2.0/docs/Data-String.html#t:String>
 
 # Evaluation
 -   Solution Verification
