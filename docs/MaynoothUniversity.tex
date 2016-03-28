@@ -1,5 +1,6 @@
 \documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
 
+% Font Fmily
 $if(fontfamily)$
   \usepackage[$for(fontfamilyoptions)$$fontfamilyoptions$$sep$,$endfor$]{$fontfamily$}
 $else$
@@ -7,6 +8,7 @@ $else$
 $endif$
 
 $if(linestretch)$
+  % Line Stretch
   \usepackage{setspace}
   \setstretch{$linestretch$}
 $endif$
@@ -16,6 +18,9 @@ $endif$
 \usepackage{fixltx2e} % provides \textsubscript
 \usepackage{graphicx}
 
+% if pdftex
+% fontfamily: $fontfamily$
+% fontfamilyoptions: $fontfamilyoptions$
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[$if(fontenc)$$fontenc$$else$T1$endif$]{fontenc}
   \usepackage[utf8]{inputenc}
@@ -34,18 +39,22 @@ $endif$
   $endif$
 
   $if(mainfont)$
+    % mainfont
     \setmainfont[$for(mainfontoptions)$$mainfontoptions$$sep$,$endfor$]{$mainfont$}
   $endif$
 
   $if(sansfont)$
+    % sansfont
     \setsansfont[$for(sansfontoptions)$$sansfontoptions$$sep$,$endfor$]{$sansfont$}
   $endif$
 
   $if(monofont)$
+    % mainfont
     \setmonofont[Mapping=tex-ansi$if(monofontoptions)$,$for(monofontoptions)$$monofontoptions$$sep$,$endfor$$endif$]{$monofont$}
   $endif$
 
   $if(mathfont)$
+    % mathfont
     \setmathfont(Digits,Latin,Greek)[$for(mathfontoptions)$$mathfontoptions$$sep$,$endfor$]{$mathfont$}
   $endif$
 
@@ -65,6 +74,7 @@ $endif$
 }{}
 
 $if(geometry)$
+  % geometry
   \usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
 $endif$
 

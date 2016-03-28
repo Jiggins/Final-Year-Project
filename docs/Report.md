@@ -11,6 +11,7 @@ course:             Computer Science and Software Engineering
 degree:             B.Sc. Single Honours
 department:         Department of Computer Science
 
+bibliography:       yes
 colorlinks:         yes
 font:               arial
 fontsize:           11pt
@@ -101,7 +102,7 @@ Haskell provides to prominent parser Libraries [attoparsec][attoparsec] and
 different in their design principles.
 
 ### Attoparsec
-attoparsec is a fast Haskell parser combinator library, aimed particularly at
+Attoparsec is a fast Haskell parser combinator library, aimed particularly at
 dealing efficiently with network protocols and complicated text/binary file
 formats.[^attoparsec-github]
 
