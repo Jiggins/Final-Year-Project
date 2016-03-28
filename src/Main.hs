@@ -5,15 +5,14 @@ import Parser.Lexer
 import Parser.Syntax
 import Parser.Types
 
-import CommandLineArgs
-
 import Control.Monad.Trans
-import Data.Functor.Identity
-import System.Console.GetOpt
+
 import System.Console.Haskeline
 import System.Environment
 import System.Exit
-import Text.Parsec hiding (runParser)
+
+import Text.Parsec
+import Text.Parsec.String
 
 interactive :: IO ()
 interactive = runInputT defaultSettings loop
@@ -30,8 +29,12 @@ interactiveLine input = case parse expr "<interactive>" input of
                           Left p -> (outputStrLn . show) p
                           Right err -> (outputStrLn . show) err
 
-fromFile :: FilePath -> IO ()
-fromFile file = undefined
+fromFile ::  String -> IO Module
+fromFile file = do
+  result <- parseFromFile moduleSignature file
+  case result of
+    Left err   -> die $ show err
+    Right exps -> return exps
 
 main :: IO ()
 main = do
@@ -39,6 +42,6 @@ main = do
   if null args
      then
       interactive
-     else
-      mapM_ print args
-
+      else do
+        modules <- mapM fromFile args
+        mapM_ print modules
