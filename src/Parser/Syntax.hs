@@ -9,26 +9,68 @@ import Text.Parsec
 
 -- * Expressions
 
+-- | Entry point to the parser
+--
+-- @
+-- expr → /'infixexp'/ :: [/'context'/ =>] /'typeExpr'/
+--      | /'infixexp'/
+-- @
 expr :: Parsec String u Expr
 expr =  try typeDefinition
     <|> infixexp
 
+-- | Any infix expression. Either a special character or a function surrounded
+-- in backticks @\`@
+--
+--  @
+--  infixexp → /'lexp'/ /'operator'/ /'infixoperator'/
+--           | - /'infixexp'/
+--           | /'lexp'/
+--  @
+--
 infixexp :: Parsec String u Expr
 infixexp =  try infixexp'
         <|> try (Negate <$> (reservedOp "-" *> infixexp))
         <|> lexp
 
+-- | Declarations, lambdas and lets
+--
+-- @
+-- lexp → \\ {/'variable'/} -> 'expr'
+--      | /'variable'/ = /'expr'/
+--      | let /'declarations'/ in /'expr'/
+--      | if /'expr'/ then /'expr'/ else /'expr'/
+--      | /'fexpr'/
+-- @
 lexp :: Parsec String u Expr
 lexp =  lambdaExpression
     <|> try (Decl <$> declaration)
-    <|> try letExpression 
+    <|> try letExpression
     <|> try ifThenElse
     <|> fexpr
 
+-- | function application
+--
+-- @
+-- fexpr → [/'fexpr'/] /'aexpr'/
+-- @
 fexpr :: Parsec String u Expr
 fexpr =  try (Function <$> aexpr <*> fexpr)
      <|> aexpr
 
+-- | Everything else
+--
+-- @
+-- aexpr → (/'expr'/)
+--       | /'variable'/
+--       | /'constructor'/
+--       | /'literal'/
+--       | @(@ /'expr'/ @,@ ... @,@ /'expr'/ @)@           (/'tuple')/
+--       | @[@ /'expr'/ @,@ ... @,@ /'expr'/ @]@           (/'list')/
+--       | @[@ /'expr'/ @,@ expr @..@ [/'expr']/ @]@       (list sequence)
+--       | @(@ /'infixexp'/ /'infixOperator'/ @)@          (/'sectionLeft')/
+--       | @(@ /'infixOperator'/ /'infixexp'/ @)@          (/'sectionRight')/
+-- @
 aexpr :: Parsec String u Expr
 aexpr =  try (parens expr)
      <|> try (Symbol <$> variable)
@@ -133,7 +175,7 @@ constructor = typeIdentifier
   <|> parens operator
 
 value :: Parsec String u String
-value = constructor <|> variable   
+value = constructor <|> variable
 
 infixOperator :: Parsec String u String
 infixOperator =  operator

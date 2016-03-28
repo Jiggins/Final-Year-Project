@@ -3,7 +3,7 @@
 
 name:                vlad
 version:             0.1.0.0
-synopsis:            TODO
+synopsis:            very lovely automatic differentiation
 -- description:
 homepage:            http://www.bcl.hamilton.ie
 license:             MIT
