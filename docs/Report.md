@@ -36,27 +36,7 @@ abstract: |
 ...
 
 # Introduction
-- Topic: Introduction to the topic addressed in the project
-- Motivation: Why would one care about the problem and the results? Cite
-    appropriate references in this section. Explain the high-level, abstract
-    problem that your project addresses. Explain what you are trying to achieve
-    in a way that leads naturally into the next section.
-- Problem statement: Describe the technical problem needed to be solved in your
-    project. Note that most projects solve both a more abstract, high-level
-    problem and a specific, technical problem: your problem statement is the
-    detailed technical problem (your motivation should cover the more abstract
-    high-level problem).
-- Approach: summarise how you addressed solving the problem. Provide an
-    overview of how you analysed the problem, how you designed a solution, and
-    how you evaluated your solution. (e.g. use of models, simulation,
-    prototypes, real-world experiments, cases- studies, etc.). What important
-    variables did you control, ignore, or measure in your evaluation.
-- Metrics: describe how are you going to evaluate your work.
-- Project: list, and briefly describe your significant achievements in the
-    project (probably 3-5 of these in a typical project). If you have come up
-    with any contributions to the state-of-the-art, make sure to include them
-    here.
-
+<!-- Change this -->
 Automatic differentiation is a set of techniques to numerically evaluate the
 derivative of a function. Derivatives of arbitrary order can be computed
 automatically, accurately to working precision, and using at most a small
@@ -70,6 +50,11 @@ That is, the only inaccuracies which occur are those which appear due to
 rounding errors in floating-point arithmetic or due to imprecise evaluations of
 elementary functions.
 
+A number of automatic differentiation tools exist in the community,[^ad-tools]
+most of which for C/C++, but also Python, F#, Fortran, Haskell and more. The
+most notable of these; Python ad[^python-ad], ADIC for C/C++[^ADIC], DiffSharp
+for F#[^DiffSharp] and [ad][ad] for Haskell. 
+
 In this project project I will be using an implementation of Automatic
 Differentiation written in Haskell, by Edward Kmett, Barak Pearlmutter and
 Jeffrey Mark Siskind. This package can be found on *Hackage* under the name
@@ -81,56 +66,65 @@ carrying the derivative around together with the undifferentiated answer.
 Reverse mode AD computes directional gradients using sparse [*Jacobian
 Matrices*][Jacobian].
 
-A number of automatic differentiation tools exist in the community,[^ad-tools]
-most of which for C/C++, but also Python, F#, Fortran, Haskell and more. The
-most notable of these; Python ad[^python-ad], ADIC for C/C++[^ADIC], DiffSharp
-for F#[^DiffSharp] and of course [ad][ad] for Haskell. This report will be
-focused on the Haskell package.
-
-Automatic differentiation is well established in the Haskell ecosystem with the
-[ad][ad] package being actively developer since May 2010.[^ad-git-hist]
-
 The project will be written in Haskell to make use of the [ad][ad] package and
 to take advantage of the rich ecosystem surrounding compiler and parser design
-in Haskell. ^[See Gabriel Gonzalez' [State of the Haskell ecosystem](https://github.com/Gabriel439/post-rfc/blob/master/sotu.md#compilers)]
+in Haskell[^ecosystem]. Automatic differentiation is well established in the
+Haskell community with the [ad][ad] package being actively developed since May
+2010.[^ad-git-hist].
+
+Haskell is fortunate to have a strong community behind it though the community
+is still relatively small when compared to other mainstream languages. This is
+due in part to the perceived difficulty to learn the language. Haskell is
+infamous for its steep learning curve and misconceptions like 'a knowledge
+category theory is needed to learn Haskell'. There are a number of blogs and
+posts contributing to this misconception, [Ian Connolly - A Lazy
+Evaluation](http://connolly.io/posts/lazy-evaluation/) and [Are there any
+downsides or problems with Haskell? - Programmers Stack
+Exchange](http://programmers.stackexchange.com/a/131865)
+
+The motivation for this project is to lower the barrier of entry to AD imposed
+by Haskell by developing a similar language that takes advantage of Haskell's
+type system and ad package while introducing new syntax to represent AD
+specific types. I will be encoding many of the commonly used types in automatic
+differentiation directly into the language's syntax. This will make it easier
+for people to reason about the new types introduced by the ad package.
+
+To tackle this program I will be building a tokeniser and parser combination to
+implement the language. The parser will be able to be read files from the
+command line or read expressions from an interactive prompt. In both cases it
+will create an abstract syntax tree using Haskell type classes. The expressions
+can then be evaluated by descending the syntax tree with a recursive `eval`
+function.
+
 The library I have chosen for this task is [Text.Parsec][parsec], a *monadic
-parser combinator library*, as it is well documented with plenty of material
-available online.
+parser combinator library*. An alternative, would be the highly performant
+[attoparsec][attoparsec] library or creating a parser combinator system from
+scratch using String manipulation. Parsec was the preferable library to use as
+it has a greater focus on parsing language than Attoparsec. Attoparsec is more
+suitable for large files or data streams such as log files or HTTP
+Headers[^attoparsec-performance].
 
 # Technical Background
-- The purpose of this chapter is to show your depth and breadth of reading and
-    understanding of the problem domain
-- Include two sections:
-    - Topic material (research material, if used, from published journals and
-        conference proceedings; less academic publications, if required by the
-        project, from other sources) – for example, what other work researchers
-        have done already in this area, what results they have produced, what
-        work has been done in related areas, what software already exists to
-        solve this or similar problems, etc.
-    -  Technical material (from any source: including books, websites) – for
-        example, how to write a web server, how to use specific Java features,
-        how to use Ajax, how to use UML to validate your design, etc.
-- Note that material relating to the motivation or non-technical background
-    should NOT go here, but rather in the introduction
+
+## Topic Material
+Automatic differentiation is a set of techniques to numerically evaluate the
+derivative of a function. Derivatives of arbitrary order can be computed
+automatically, accurately to working precision, and using at most a small
+constant factor more arithmetic operations than the original program. Automatic
+Differentiation excels over traditional approximative and symbolic methods.
+Approximative methods are are prone to truncation and rounding errors and
+symbolic differentiation lead to significantly long computation times. While
+Automatic Differentiation is also numerical differentiation, in the sense that
+it computes numerical values, it computes derivatives up to machine precision.
+That is, the only inaccuracies which occur are those which appear due to
+rounding errors in floating-point arithmetic or due to imprecise evaluations of
+elementary functions.
+
+## Technical Material
 
 # The Problem
-- The purpose of this chapter is to clearly explain the technical problem
-    and/or identify the user requirements
-- Provide any model(s) of the problem (e.g. equations, ERD’s, UML Use Cases
-    & Scenarios, Activity Diagrams, etc.)
-- Provide any analysis of the problem, leading to a greater understanding
-- There should be no decisions made in this chapter
 
 # The Solution
--   The purpose of this chapter is to clearly identify, discuss, and justify the
-    decisions you make
--   Depending on your type of project, you may not need to include all of these
--   Anaytical Work: E.g. Equations, etc. that describe your solution
--   Architectural Level: E.g. Implementation Diagrams
--   High-Level Design: E.g. Packages, Class Diagrams, etc.
--   Low-Level Design: E.g. Method speci cations, Algorithms, etc.
--   Implementation: discuss anything interesting here, put full source code in
-    an appendix or attachment
 
 \pagebreak
 
@@ -145,9 +139,9 @@ dealing efficiently with network protocols and complicated text/binary file
 formats.[^attoparsec-github]
 
 Attoparsec focuses on high performance parsing of large amounts of raw data or
-working with binary file formats. Attoparsec can work with `ByteString`s,
-a more efficient way of representing Strings as Byte Strings rather than Lists
-of Characters.[^string]
+working with binary file formats[^attoparsec-performance]. Attoparsec can work
+with `ByteString`s, a more efficient way of representing Strings as Byte
+Strings rather than Lists of Characters.[^string]
 
 Attoparsec forgoes some high-level features and readability of error messages
 for performance.
@@ -172,75 +166,11 @@ be an issue as a programming language should never surpass gigabytes in size.
 Additionally Parsec provides a more user friendly experience with well written
 documentation.
 
-[attoparsec]: http://hackage.haskell.org/package/attoparsec
-[error]:      https://hackage.haskell.org/package/parsec-3.1.9/docs/Text-Parsec-Error.html
-[parsec]:     http://hackage.haskell.org/package/parsec
-
-[^attoparsec-github]: attoparsec readme file.
-    <https://github.com/bos/attoparsec/blob/master/README.markdown>
-[^parsec-package]: Parsec Hackage page
-    <https://hackage.haskell.org/package/parsec-3.1.9>
-[^string]: `type String = [Char]`
-    <https://hackage.haskell.org/package/base-4.8.2.0/docs/Data-String.html#t:String>
-
 # Evaluation
--   Solution Verification
-    -   E.g. use your equations to verify the correctness of your solution
-
--   Software Design Verification: how did you show that your design worked properly?
-    -   Using a model of your solution Page 9 of 18
-    -   E.g. use UML interaction diagrams to verify each scenario
-    -   Software Verification: how did you demonstrate your software worked
-        properly?
-
-
-    - If you have not tested your software, then you cannot rely on
-        your results. Clearly describe:
-        1. Your test approach (i.e. unit testing, sub-system testing, system
-            testing)
-        2. Your tests (e.g. scenarios, test cases, test data, etc.)
-        3. Your test results
-        4. An interpretation of the results
-
--   Validation/Measurements: how did you measure how well your solution solved
-    the problem
-    -   Results
-    -   Explanation of Results
-    -   Analysis of Results
-    -   Comparison with previous solutions (if relevant)
-
 
 # Conclusions
--   Identify and discuss the implications of your work.
--   If you made a contribution to the state-of-the-art, clearly identify it
-    here.
--   Discuss whether your results are general, potentially generalizable, or
-    specific to a particular case.
--   Identify threats to the validity of your results (e.g. limitations, risks
-    introduced by your approach, etc.)
--   Discuss your project approach
--   Discuss future work, based on what you have done (and not done)
-
 
 # References
--   You must include a list of all cited works here. Use standard guidelines for
-    these (e.g. IEEE guidelines3, APA guidelines) as advised by your supervisor.
--   The best references are peer-reviewed publications and books.
--   Note: you must NEVER give just a URL for a reference. At the least it must
-    include an author (even if the company’s name), a publisher (may also be the
-    company’s name), a title, and a date (if none available, use the date
-    last accessed). If you have a URL for the document, include \[<URL>,
-    accessed on: <date last accessed>\] in square brackets at the end of
-    the reference.
--   Non-reviewed material (such as blogs, Wikipedia, etc.) does not make a
-    suitable reference, except in the case of technical material have you have
-    been able to verify by checking their implementation (you should state how
-    you did this).
-
-    -   Material from other publications (such as journals, newspapers,
-        magazines, official reports, etc.) may be used sparingly, especially if
-        important for motivating your work.
-
 
 # Appendices
 Include here all extra material, e.g. your source code, project management
@@ -254,17 +184,34 @@ discussion of what you would do differently if you repeated the project.
 [parsec]: https://hackage.haskell.org/package/parsec "parsec: Monadic parser combinators"
 [HM]: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.18.9348&rep=rep1&type=pdf "Generalizing Hindley-Milner Type Inference Algorithms"
 
+[attoparsec]: http://hackage.haskell.org/package/attoparsec
+[error]:      https://hackage.haskell.org/package/parsec-3.1.9/docs/Text-Parsec-Error.html
+
 <!-- References -->
 
-[^ad-git-hist]: Commit history for the ad package <https://github.com/ekmett/ad/graphs/contributors>
 [^ad-tools]: Autodiff.org <http://www.autodiff.org/?module=Tools&language=ALL>
 [^python-ad]: Python Automatic Differentiation package <https://pypi.python.org/pypi/ad/1.2.3>
 [^ADIC]: ADIC: Automatic Differentiation for C and C++ <http://trac.mcs.anl.gov/projects/ADIC>
 [^DiffSharp]: DiffSharp: Differentiable Functional Programming <http://diffsharp.github.io/DiffSharp/>
+[^ad-git-hist]: Commit history for the ad package <https://github.com/ekmett/ad/graphs/contributors>
 
+[^ecosystem]: Gabriel Gonzalez' [State of the Haskell ecosystem][ecosystem-link]
 [^Papers]: The two I have been using most are [Parsec, a fast combinator
   parser][parsec-paper] by Daan Leijen for parsec and [A Hitchhiker’s Guide to
   Automatic Differentiation][Hitchhiker] by Philipp H. W. Hoffmann for ad
 
+[^attoparsec-performance]: Bryan O' Sullivan (author of Attoparsec) - What's in
+    a parsing library? [Part 1][attoparsec-1], [Part 2][attoparsec-2]
+
+[^attoparsec-github]: attoparsec readme file.
+    <https://github.com/bos/attoparsec/blob/master/README.markdown>
+[^parsec-package]: Parsec Hackage page
+    <https://hackage.haskell.org/package/parsec-3.1.9>
+[^string]: `type String = [Char]`
+    <https://hackage.haskell.org/package/base-4.8.2.0/docs/Data-String.html#t:String>
+
 [parsec-paper]: https://web.archive.org/web/20120401040711/http://legacy.cs.uu.nl/daan/download/parsec/parsec.pdf
 [Hitchhiker]: http://arxiv.org/abs/1411.0583
+[ecosystem-link]: https://github.com/Gabriel439/post-rfc/blob/master/sotu.md#compilers]
+[attoparsec-1]: http://www.serpentine.com/blog/2010/03/03/whats-in-a-parsing-library-1/
+[attoparsec-2]: http://www.serpentine.com/blog/2010/03/03/whats-in-a-parser-attoparsec-rewired-2/
