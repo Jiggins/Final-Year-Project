@@ -98,11 +98,13 @@ function.
 
 The library I have chosen for this task is [Text.Parsec][parsec], a *monadic
 parser combinator library*. An alternative, would be the highly performant
-[attoparsec][attoparsec] library or creating a parser combinator system from
+from[attoparsec][attoparsec] library or creating a parser combinator system 
 scratch using String manipulation. Parsec was the preferable library to use as
 it has a greater focus on parsing language than Attoparsec. Attoparsec is more
 suitable for large files or data streams such as log files or HTTP
 Headers[^attoparsec-performance].
+
+\pagebreak
 
 # Technical Background
 
@@ -118,7 +120,28 @@ Automatic Differentiation is also numerical differentiation, in the sense that
 it computes numerical values, it computes derivatives up to machine precision.
 That is, the only inaccuracies which occur are those which appear due to
 rounding errors in floating-point arithmetic or due to imprecise evaluations of
-elementary functions.
+elementary functions.[^hitchhiker-paper]
+
+Automatic differentiation works by systematically applying the chain rule of
+differential calculus at the elementary operator level. It differers from
+numerical differentiation in that, numerical differentiation is the finite
+difference approximation of derivatives calculated by evaluating the function
+at a set of points. Simply, its based on the standard definition of
+a derivative; given a function $f$ of many variables $f : \mathbb{R}
+\rightarrow \mathbb{R}$, a gradient $\nabla f = \left ( \frac{\partial
+f}{\partial x_1}, \dots, \frac{\partial f}{\partial x_n} \right )$ can be
+approximated using
+
+$$
+\frac{\partial f(x)}{\partial x_i} \approx \frac{f(x + hv_i) - f(x)}{h},
+$$
+
+where $v_i$ is the $i$-th unit vector and $h$ is the step size where $h > 0$.
+Numeric differentiation suffers from cancellation and rounding-errors in the
+discretization, the process of transferring continuous functions into discrete
+counterparts. Additionally, numerical differentiation can be slow at computing
+the partial derivatives of a function with respect to many inputs, as is often
+the case in gradient based optimization algorithms.
 
 ## Technical Material
 
@@ -196,9 +219,8 @@ discussion of what you would do differently if you repeated the project.
 [^ad-git-hist]: Commit history for the ad package <https://github.com/ekmett/ad/graphs/contributors>
 
 [^ecosystem]: Gabriel Gonzalez' [State of the Haskell ecosystem][ecosystem-link]
-[^Papers]: The two I have been using most are [Parsec, a fast combinator
-  parser][parsec-paper] by Daan Leijen for parsec and [A Hitchhiker’s Guide to
-  Automatic Differentiation][Hitchhiker] by Philipp H. W. Hoffmann for ad
+[^parsec-paper]: Daan Leijen [Parsec, a fast combinator parser][parsec-paper]
+[^hitchhiker-paper]: Philipp H. W. Hoffmann [A Hitchhiker’s Guide to Automatic Differentiation][Hitchhiker]
 
 [^attoparsec-performance]: Bryan O' Sullivan (author of Attoparsec) - What's in
     a parsing library? [Part 1][attoparsec-1], [Part 2][attoparsec-2]
@@ -215,3 +237,5 @@ discussion of what you would do differently if you repeated the project.
 [ecosystem-link]: https://github.com/Gabriel439/post-rfc/blob/master/sotu.md#compilers]
 [attoparsec-1]: http://www.serpentine.com/blog/2010/03/03/whats-in-a-parsing-library-1/
 [attoparsec-2]: http://www.serpentine.com/blog/2010/03/03/whats-in-a-parser-attoparsec-rewired-2/
+
+<!-- vim: set makeprg=./mkReport.sh -->
