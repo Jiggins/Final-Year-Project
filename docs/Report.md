@@ -34,6 +34,20 @@ abstract: |
         your results, and your conclusions.
 ...
 
+# Declaration
+
+I hereby certify that this material, which I now submit for assessment on the
+program of study leading to the award of B.Sc. Single Honours in Computer
+Science and Software Engineering, is _entirely_ my own work and has not been
+taken from the work of others - save and to the extent that such work has been
+cited and acknowledged within the text of my work.
+
+Signed:
+
+Date: 31 Mar 2016 
+
+\pagebreak
+
 # Introduction
 <!-- Change this -->
 Automatic differentiation is a set of techniques to numerically evaluate the
@@ -241,15 +255,52 @@ in a two stage process; first the function is run forward, populating the
 variables $v_i$, keeping track of dependencies in the graph. Derivatives are
 then calculated by propagating adjoints $\bar{v}_i$ in reverse. [@baydin]
 
+### Monadic Parser Combinators
+Combinators are higher order functions that use function application and other
+combinators to define a composite function. Combinators are a product of
+combinatory logic. Combinatory logic was introduced by Haskell Curry and Moses
+Schönfinkel[@10.2307/2370619]. In computer science, combinatory logic can be
+used as a simplified model of computation and forms the basis for many
+functional programming languages.
+
+In the realm of software design, combinators are implemented as higher order
+functions that compose functions together. Take, for example, function
+composition $(.)$ as defined in the Haskell prelude.
+
+```haskell
+(.) :: (b -> c) -> (a -> b) -> a -> c
+f . g = \x -> f (g x)
+```
+
+This combinator takes two functions as arguments and returns a new function,
+the composition of the two arguments.
+
 ## Technical Material
 
 # The Problem
 
 **Include 'AD is underused'**
 
+\pagebreak
+
 # The Solution
 
-\pagebreak
+## The Combinator Pattern
+The combinator design pattern is popular amongst Haskell libraries. This is
+where the library provides some very simple 'primitive' functions and a set of
+combinators. Complex structures can be created by combining primitive
+functions using combinators.[@combinator-pattern]
+
+The combinator pattern has the advantage of providing a wide range of
+functionality with relatively little code. By combining primitive functions the
+end user can flexibly create any number of composite functions to suit their
+needs. Another advantage of the combinator pattern is the streamlining of
+testing and verification. Once the primitive and combinator functions have been
+thoroughly tested/verified, the composite functions should not require as much
+scrutiny in testing since many of the edge cases should be caught when testing
+primitive functions.
+
+ad, Parsec, Attoparsec and this project implement the combinator pattern.
 
 ## Choosing a Parser Library
 Haskell provides to prominent parser Libraries [attoparsec][attoparsec] and
@@ -261,10 +312,11 @@ Attoparsec is a fast Haskell parser combinator library, aimed particularly at
 dealing efficiently with network protocols and complicated text/binary file
 formats.[^attoparsec-github]
 
-Attoparsec focuses on high performance parsing of large amounts of raw data or
-working with binary file formats[^attoparsec-performance]. Attoparsec can work
-with `ByteString`s, a more efficient way of representing Strings as Byte
-Strings rather than Lists of Characters.[^string]
+Attoparsec is a fork of the Parsec library that focuses on high performance
+parsing of large amounts of raw data or working with binary file
+formats[^attoparsec-performance]. Attoparsec can work with `ByteString`s, a
+more efficient way of representing Strings as Byte Strings rather than Lists of
+Characters.[^string]
 
 Attoparsec forgoes some high-level features and readability of error messages
 for performance.
