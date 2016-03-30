@@ -11,7 +11,6 @@ course:             Computer Science and Software Engineering
 degree:             B.Sc. Single Honours
 department:         Department of Computer Science
 
-bibliography:       yes
 colorlinks:         yes
 font:               arial
 fontsize:           11pt
@@ -53,7 +52,7 @@ elementary functions.
 A number of automatic differentiation tools exist in the community,[^ad-tools]
 most of which for C/C++, but also Python, F#, Fortran, Haskell and more. The
 most notable of these; Python ad[^python-ad], ADIC for C/C++[^ADIC], DiffSharp
-for F#[^DiffSharp] and [ad][ad] for Haskell. 
+for F#[^DiffSharp] and [ad][ad] for Haskell.
 
 In this project project I will be using an implementation of Automatic
 Differentiation written in Haskell, by Edward Kmett, Barak Pearlmutter and
@@ -98,7 +97,7 @@ function.
 
 The library I have chosen for this task is [Text.Parsec][parsec], a *monadic
 parser combinator library*. An alternative, would be the highly performant
-from[attoparsec][attoparsec] library or creating a parser combinator system 
+from[attoparsec][attoparsec] library or creating a parser combinator system
 scratch using String manipulation. Parsec was the preferable library to use as
 it has a greater focus on parsing language than Attoparsec. Attoparsec is more
 suitable for large files or data streams such as log files or HTTP
@@ -139,13 +138,114 @@ $$
 where $v_i$ is the $i$-th unit vector and $h$ is the step size where $h > 0$.
 Numeric differentiation suffers from cancellation and rounding-errors in the
 discretization, the process of transferring continuous functions into discrete
-counterparts. Additionally, numerical differentiation can be slow at computing
-the partial derivatives of a function with respect to many inputs, as is often
-the case in gradient based optimization algorithms.
+counterparts. Additionally, numerical differentiation performs in $O(n)$ time
+for a gradient in $n$ dimensions, this can be slow at computing the partial
+derivatives of a function with respect to many inputs, as is often the case in
+gradient based optimization algorithms. In contrast, automatic differentiation
+calculates the derivatives while evaluating the function.
+
+Automatic differentiation utilises the fact that any function is the
+composition of a number of primitive operations. The partial derivative of
+these operations can be composed to derive an entire program at
+a point[^ad-readme].
+
+### Forward Mode Automatic Differentiation
+One approach to automatic differentiation is to use operator overloading. The
+primitive operations can be overloaded to work with a dual representation of
+number. In its simplest form, can be represented as a pair of values and
+derivatives. Here they are represented in Haskell using a type class.
+
+```haskell
+{-# LANGUAGE RankNTypes #-}
+data Dual s a = Dual
+  { value      :: a
+  , derivative :: a
+  } deriving (Show)
+
+lift ::  Num a => a -> Dual s a
+lift x = Dual x 0
+
+infinitesimal :: Num a => Dual s a
+infinitesimal = Dual 0 1
+
+instance Num a => Num (Dual s a) where
+  Dual x x' + Dual y y' = Dual (x + y) (x' + y')
+  Dual x x' * Dual y y' = Dual (x * y) (x' * y + x * y')
+  negate (Dual x x')    = Dual (negate x) (negate x')
+  abs    (Dual x x')    = Dual (abs x) (signum x * x')
+  signum (Dual x _)     = lift (signum x)
+  fromInteger           = lift . fromInteger
+
+instance Fractional a => Fractional (Dual s a) where
+  recip (Dual x x') = Dual (recip x) (-x'/x/x)
+  fromRational      = lift . fromRational
+```
+
+This example represents a dual number as a pair of type class containing two
+polymorphic fields 'value' and 'derivative'. By creating an instance for the
+$Num$ and $Fractional$ class, the standard numeric operators, $+, -, *\ and\ /$,
+are overloaded for the $Dual$ type to evaluate both the value and derivative of
+a function. A dual number can be created using the $lift$ function, which
+'lifts' a number to a constant quantity. By defining the function $diff$,
+
+```haskell
+diff :: Num a => (forall s. Dual s a -> Dual s a) -> (a, a)
+diff f = let Dual y y' = f infinitesimal
+         in (y,y')
+```
+
+it is now possible to compute the derivative for any function of type $\lambda
+a:Num \cdot\ \forall s\ \cdot\ Dual\ s\ a \rightarrow Dual\ s\ a$. For higher
+dimensional functions, a Jacobian matrix is used.
+
+### Reverse Mode Automatic Differentiation
+Reverse mode AD computes directional gradients using sparse [*Jacobian
+Matrices*][Jacobian]. A Jacobian matrix is the matrix of first order partial
+derivatives of a function. Given the function $f: \mathbb{R}^n \rightarrow
+\mathbb{R}^m$ with an input vector $x \in \mathbb{R}^n$ that produces an vector
+$f(x) \in \mathbb{R}^m$, then the corresponding Jacobian matrix $J$ of $f$ is
+an $m \times n$
+
+$$
+J = \frac{df}{dx} =
+\begin{bmatrix}
+    \frac {\partial f_1} {\partial x_1} & \dots  & \frac {\partial f_1} {\partial x_n} \\
+    \vdots                              & \ddots & \vdots                              \\
+    \frac {\partial f_m} {\partial x_1} & \dots  & \frac {\partial f_m} {\partial x_n}
+\end{bmatrix}
+$$
+
+Automatic differentiation in the reverse accumulation mode is a generalised
+form of the back propagation algorithm of neural networks. Given the fact that
+any function is the composition of a number of primitive operations, a function
+can be broken up into a directed computational graph of intermediate primitive
+functions. In the case of the [ad][ad] package, the [data-reify][data-reify]
+package is used[^ad-cabal]. [data-reify][data-reify] is a library for
+transforming a recursive data structure into an explicit graph. The [ad][ad]
+package utilises this to construct the computational graph of a function before
+applying back propagation.
+
+<!-- Maybe include an image here -->
+
+The algorithm propagates derivatives backwards through this graph from a given
+output. This is done by supplementing each intermediate variable $v_i$, with an
+adjoint
+
+$$
+\bar{v}_i = \frac {\partial y_i} {\partial v_i},
+$$
+
+which represents the sensitivity of a considered output $y_j$ with respect to
+changes in $v_i$.\cite{DBLP:journals/corr/BaydinPR15} Derivatives are computed
+in a two stage process; first the function is run forward, populating the
+variables $v_i$, keeping track of dependencies in the graph. Derivatives are
+then calculated by propagating adjoints $\bar{v}_i$ in reverse. [@baydin]
 
 ## Technical Material
 
 # The Problem
+
+**Include 'AD is underused'**
 
 # The Solution
 
@@ -210,6 +310,8 @@ discussion of what you would do differently if you repeated the project.
 [attoparsec]: http://hackage.haskell.org/package/attoparsec
 [error]:      https://hackage.haskell.org/package/parsec-3.1.9/docs/Text-Parsec-Error.html
 
+[data-reify]: https://hackage.haskell.org/package/data-reify
+
 <!-- References -->
 
 [^ad-tools]: Autodiff.org <http://www.autodiff.org/?module=Tools&language=ALL>
@@ -221,6 +323,9 @@ discussion of what you would do differently if you repeated the project.
 [^ecosystem]: Gabriel Gonzalez' [State of the Haskell ecosystem][ecosystem-link]
 [^parsec-paper]: Daan Leijen [Parsec, a fast combinator parser][parsec-paper]
 [^hitchhiker-paper]: Philipp H. W. Hoffmann [A Hitchhiker’s Guide to Automatic Differentiation][Hitchhiker]
+
+[^ad-readme]: Edward Kmett - ad README.markdown <https://github.com/ekmett/ad/blob/master/README.markdown>
+[^ad-cabal]: Edward Kmett - ad.cabal - data-reify listed as dependency for ad <https://github.com/ekmett/ad/blob/master/ad.cabal#L110>
 
 [^attoparsec-performance]: Bryan O' Sullivan (author of Attoparsec) - What's in
     a parsing library? [Part 1][attoparsec-1], [Part 2][attoparsec-2]
@@ -237,5 +342,4 @@ discussion of what you would do differently if you repeated the project.
 [ecosystem-link]: https://github.com/Gabriel439/post-rfc/blob/master/sotu.md#compilers]
 [attoparsec-1]: http://www.serpentine.com/blog/2010/03/03/whats-in-a-parsing-library-1/
 [attoparsec-2]: http://www.serpentine.com/blog/2010/03/03/whats-in-a-parser-attoparsec-rewired-2/
-
 <!-- vim: set makeprg=./mkReport.sh -->
