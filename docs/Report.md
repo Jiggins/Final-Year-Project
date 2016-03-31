@@ -44,7 +44,7 @@ cited and acknowledged within the text of my work.
 
 Signed:
 
-Date: 31 Mar 2016 
+Date: 31 Mar 2016
 
 \pagebreak
 
@@ -94,6 +94,8 @@ posts contributing to this misconception, [Ian Connolly - A Lazy
 Evaluation](http://connolly.io/posts/lazy-evaluation/) and [Are there any
 downsides or problems with Haskell? - Programmers Stack
 Exchange](http://programmers.stackexchange.com/a/131865)
+
+<!-- **Include 'AD is underused'** -->
 
 The motivation for this project is to lower the barrier of entry to AD imposed
 by Haskell by developing a similar language that takes advantage of Haskell's
@@ -273,15 +275,85 @@ f . g = \x -> f (g x)
 ```
 
 This combinator takes two functions as arguments and returns a new function,
-the composition of the two arguments.
+the composition of the two arguments. Combinators allow for flexibly in
+software development as many complex composite functions can be created with
+relatively few functions and combinator.
+
+Another common example, one that will be used extensively throughout this
+project and the libraries that support it, is the $Alternative$ monoid. The
+Alternative monoid is a sub-class of the $Applicative$ class[^alternative].
+The Alternative class is used to model an action that can fail.
+
+The Alternative class defines the `<|>` operator. This operator defines a
+sequence of alternate actions to perform in the case of an earlier computation
+failing. This combinator serves to compose a number of actions and follow the
+first successful path.
+
+When applied to a Parser, a number of functions can be defined to represent the
+lexemes of a language. These lexemes can be composed using the `<|>` operator
+such that if the input does not satisfy the lexeme, it will attempt to use the
+next alternative.
 
 ## Technical Material
 
+### Write You a Haskell - Stephen Diehl
+'Write you a Haskell' is a blog series by Stephen Diehl on _Building a modern
+functional compiler from first principles_[@write-you-a-haskell]. The name is a
+parody of the popular [_Learn You a Haskell for Great
+Good_](http://learnyouahaskell.com) by _Miran Lipovača_. This series of blog
+posts attempts build a small functional language in an effort to teach the
+reader some intermediate level Haskell and highlight some of the features and
+libraries the language has to offer. At the time of writing, this series is
+unfinished with 10 of the planned 28 chapters completed.
+
+### Real World Haskell - Bryan O'Sullivan, Don Stewart, and John Goerzen
+Similar to Stephen Diehl's 'Write You a Haskell', chapter 16 of _Real World
+Haskell_[@real-world-haskell] focuses on introducing the reader to
+Monadic Parser libraries through a series of simple examples. In contrast,
+however, Real World Haskell provides a number of small self-contained examples
+rather than one large project.
+
 # The Problem
+As mentioned earlier, automatic differentiation is advantageous over its
+Numeric and symbolic counterparts due too its efficiency and accuracy. It is
+ideal for certain applications like machine learning. Despite this, up until
+recently automatic differentiation was thought to be 'criminally' underused in
+the field of machine learning[@ad-underused].
 
-**Include 'AD is underused'**
+I believe that automatic differentiation is intimidating to new users. In
+particular the $ad$ package, from its use of $Rank\ N\ Types$ and lengthy type
+signatures will be intimidating even to users with an intermediate to advanced
+knowledge of Haskell. Take, for example, the $grad$ function as it is defined
+in [Numeric.AD](https://hackage.haskell.org/package/ad-4.3.2/docs/Numeric-AD.html#g:2)
 
-\pagebreak
+```haskell
+grad :: (Traversable f, Num a) => (forall s. Reifies s Tape => f (Reverse s a) -> Reverse s a) -> f a -> f a
+```
+
+Type signatures like $grad$ can be difficult to reason about without prior
+knowledge of the library. The reserved word $forall$ requires experience of
+Rank N types and $Reifies$ implies that the _data-reify_ library is needed but
+it is not clear as to why unless the user understands the underlying
+implementation of _Reverse Mode_.
+
+In light of this, the goal of the project is to build a domain specific
+language to simplify the process of automatic differentiation. I hope to
+develop a similar language with support for automatic differentiation built
+into the syntax. The intention is develop a system where the difficult concepts
+of automatic differentiation are simplified by the syntax so that a new user
+does not need to waste any time learning about the implementation details of
+ad.
+
+The user should expect to see similar features to any modern interpreter. That
+is the following:
+
+-   Evaluate a number of files on the command line.
+-   Enter a REPL (Read Evaluate Print Loop), like *irb (Ruby), python and
+    ghci (Haskell)* to quickly evaluate code.
+-   Have support for the GNU Readline library, that grants support for using
+    standard GNU navigation controls, like the arrow keys. (mappings taken from
+    the `.inputrc` file)
+-   Specify an `.rc` file for the user to specify run time settings.
 
 # The Solution
 
@@ -341,7 +413,38 @@ be an issue as a programming language should never surpass gigabytes in size.
 Additionally Parsec provides a more user friendly experience with well written
 documentation.
 
+## Using the Monadic Parser Combinators
+Parsec provides an instance for $Alternative$ for the $ParsecT$ type class in
+[Text.Parsec.Prim](https://hackage.haskell.org/package/parsec-3.1.9/docs/Text-Parsec-Prim.html).
+That defines the `<|>` operator for parser types
+
+## Building a Lexer
+
+## Abstract Syntax tree
+
+### Function Application
+
+## Reading Files, Interactive Prompt and GNU Readline
+This section was implemented entirely in the $Main$ module. This module differs
+form others in that it adopts an imperative style rather than functional, since
+the Main module defines a sequential set of actions which is easier to express
+in imperative programming
+
+The interactive prompt and interpreter are very similar in their
+implementation. They only differ in that the interactive prompt uses recursive
+calls to loop until and it receives an EOF.
+
+Implementing the GNU Readline library was a relatively simple task. I used the
+[Haskeline][haskeline] library which provides an interface to GNU Readline.
+Very little needed to be changed in the Main module for Readline support. I
+swapped out Haskell's built in `getLine` and `putStrLn` with `getInputLine`
+and `outputStrLn` respectively, both provided by Haskeline. Finally I wrapped
+the main loop for the interactive prompt in an `InputT` monad transformer that
+carries the state and settings required by GNU Readline.
+
 # Evaluation
+
+## HSpec Test Suite
 
 # Conclusions
 
@@ -364,6 +467,8 @@ discussion of what you would do differently if you repeated the project.
 
 [data-reify]: https://hackage.haskell.org/package/data-reify
 
+[haskeline]: https://hackage.haskell.org/package/haskeline
+
 <!-- References -->
 
 [^ad-tools]: Autodiff.org <http://www.autodiff.org/?module=Tools&language=ALL>
@@ -378,6 +483,9 @@ discussion of what you would do differently if you repeated the project.
 
 [^ad-readme]: Edward Kmett - ad README.markdown <https://github.com/ekmett/ad/blob/master/README.markdown>
 [^ad-cabal]: Edward Kmett - ad.cabal - data-reify listed as dependency for ad <https://github.com/ekmett/ad/blob/master/ad.cabal#L110>
+
+[^alternative]: Shown by the definition of $Alternative$ - `class Applicative f => Alternative f where` $\dots$ -
+    <http://hackage.haskell.org/package/base-4.8.2.0/docs/Control-Applicative.html#g:2>
 
 [^attoparsec-performance]: Bryan O' Sullivan (author of Attoparsec) - What's in
     a parsing library? [Part 1][attoparsec-1], [Part 2][attoparsec-2]

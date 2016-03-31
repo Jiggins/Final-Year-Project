@@ -26,7 +26,7 @@ interactive = runInputT defaultSettings loop
 
 interactiveLine :: MonadIO m => String -> InputT m ()
 interactiveLine input = case parse expr "<interactive>" input of
-                          Left p -> (outputStrLn . show) p
+                          Left exp  -> (outputStrLn . show) exp
                           Right err -> (outputStrLn . show) err
 
 fromFile ::  String -> IO Module
