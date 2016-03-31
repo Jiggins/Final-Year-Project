@@ -97,7 +97,7 @@ typeIdentifier = lexeme (
      ; cs <- many (Token.identLetter langDef)
      ; return (c:cs)
      })
-  <?> "uppercase letter for types"
+  <?> "type"
 
 -- | I didn't like the default integer token parsing `+1` as (1 :: Int) as it
 -- makes it difficult to parse arithmetic.
