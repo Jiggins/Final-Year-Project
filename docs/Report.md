@@ -1,6 +1,6 @@
 ---
-title:              Final Year Project
-subtitle:           Final Year Project
+title:              VLAD - Very Lovely Automatic Differentiation
+subtitle:           Automatic Differentiation interpreter
 author:             Jack Higgins
 email:              Jack.Higgins@nuim.ie
 date:               Thu 28 Jan 2016
@@ -20,22 +20,22 @@ papersize:          A4
 toc:                yes
 
 abstract: |
-    - The abstract must be an accurate reflection of what is in your report.
+    This report documents my findings from an exploration into developing
+    a programming language focused on simplifying automatic differentiation.
 
-    - Your abstract must be self-contained, without abbreviations, footnotes,
-        or references. It should be a microcosm of the full report.
+    Despite its known advantages over Numeric and Symbolic Differentiation,
+    Automatic Differentiation has, up until recently, been underutilised in
+    fields that require differential algorithms, such as machine learning.
+    One possible cause of this 'criminal' underutilisation of of automatic
+    differentiation may be the intimidating APIs. This project attempts to
+    tackle this issue by developing a new programming language that integrates
+    automatic differentiation types directly into the syntax of the language.
 
-    - Your abstract must be 150-250 words written as one paragraph, and should
-        not contain displayed mathematical equations or tabular material.
-
-    - Ensure that your abstract reads well and is grammatically correct.
-
-    - The abstract must cover; motivation, the problem statement, the approach,
-        your results, and your conclusions.
+    This theseis the process involved in developing a new language from early
+    concept to final implemtation.
 ...
 
 # Declaration
-
 I hereby certify that this material, which I now submit for assessment on the
 program of study leading to the award of B.Sc. Single Honours in Computer
 Science and Software Engineering, is _entirely_ my own work and has not been
@@ -49,7 +49,6 @@ Date: 31 Mar 2016
 \pagebreak
 
 # Introduction
-<!-- Change this -->
 Automatic differentiation is a set of techniques to numerically evaluate the
 derivative of a function. Derivatives of arbitrary order can be computed
 automatically, accurately to working precision, and using at most a small
@@ -61,7 +60,7 @@ Automatic Differentiation is also numerical differentiation, in the sense that
 it computes numerical values, it computes derivatives up to machine precision.
 That is, the only inaccuracies which occur are those which appear due to
 rounding errors in floating-point arithmetic or due to imprecise evaluations of
-elementary functions.
+elementary functions.[@hitchhiker-paper]
 
 A number of automatic differentiation tools exist in the community,[^ad-tools]
 most of which for C/C++, but also Python, F#, Fortran, Haskell and more. The
@@ -125,17 +124,7 @@ Headers[^attoparsec-performance].
 
 ## Topic Material
 Automatic differentiation is a set of techniques to numerically evaluate the
-derivative of a function. Derivatives of arbitrary order can be computed
-automatically, accurately to working precision, and using at most a small
-constant factor more arithmetic operations than the original program. Automatic
-Differentiation excels over traditional approximative and symbolic methods.
-Approximative methods are are prone to truncation and rounding errors and
-symbolic differentiation lead to significantly long computation times. While
-Automatic Differentiation is also numerical differentiation, in the sense that
-it computes numerical values, it computes derivatives up to machine precision.
-That is, the only inaccuracies which occur are those which appear due to
-rounding errors in floating-point arithmetic or due to imprecise evaluations of
-elementary functions.[@hitchhiker-paper]
+derivative of a function.
 
 Automatic differentiation works by systematically applying the chain rule of
 differential calculus at the elementary operator level. It differers from
